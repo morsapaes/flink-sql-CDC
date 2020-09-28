@@ -9,7 +9,7 @@
         "database.password": "postgres",
         "database.dbname" : "postgres",
         "database.server.name": "pg_claims",
-        "schema.whitelist": "claims",
+        "table.whitelist": "claims.accident_claims",
         "value.converter": "org.apache.kafka.connect.json.JsonConverter",
         "value.converter.schemas.enable": false,
         "decimal.handling.mode": "double",
