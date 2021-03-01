@@ -7,7 +7,7 @@ See the [slides](https://noti.st/morsapaes/liQzgs/change-data-capture-with-flink
 To keep things simple, this demo uses a Docker Compose setup that makes it easier to bundle up all the services you need for your CDC pipeline:
 
 <p align="center">
-<img width="650" alt="demo_overview" src="https://user-images.githubusercontent.com/23521087/90702325-3c67f980-e28b-11ea-8496-9f237ceeae8b.png">
+<img width="700" alt="demo_overview" src="https://user-images.githubusercontent.com/23521087/90702325-3c67f980-e28b-11ea-8496-9f237ceeae8b.png">
 </p>
 
 #### Getting the setup up and running
@@ -19,7 +19,7 @@ To keep things simple, this demo uses a Docker Compose setup that makes it easie
 
 `docker-compose ps`
 
-You should be able to acess the Flink Web UI (http://localhost:8081), as well as Kibana (http://localhost:5601).
+You should be able to access the Flink Web UI (http://localhost:8081), as well as Kibana (http://localhost:5601).
 
 ## Postgres
 
@@ -37,15 +37,19 @@ SELECT * FROM information_schema.tables WHERE table_schema='claims';
 
 Start the [Debezium Postgres connector](https://debezium.io/documentation/reference/1.2/connectors/postgresql.html) using the configuration provided in the `register-postgres.json` file:
 
-`curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @register-postgres.json`
+```bash
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @register-postgres.json
+```
 
 Check that the connector is running:
 
-`curl http://localhost:8083/connectors/claims-connector/status # | jq`
+```bash
+curl http://localhost:8083/connectors/claims-connector/status # | jq
+```
 
 The first time it connects to a Postgres server, Debezium takes a [consistent snapshot](https://debezium.io/documentation/reference/1.2/connectors/postgresql.html#postgresql-snapshots) of all database schemas; so, you should see that the pre-existing records in the `accident_claims` table have already been pushed into your Kafka topic:
 
-```
+```bash
 docker-compose exec kafka /kafka/bin/kafka-console-consumer.sh \
     --bootstrap-server kafka:9092 \
     --from-beginning \
@@ -77,7 +81,9 @@ In the output of your Kafka console consumer, you should now see three consecuti
 
 Start the Flink SQL Client:
 
-`docker-compose exec sql-client ./sql-client.sh`
+```bash
+docker-compose exec sql-client ./sql-client.sh
+```
 
 Register a [Postgres catalog](https://ci.apache.org/projects/flink/flink-docs-stable/dev/table/connectors/jdbc.html#postgres-database-as-a-catalog), so you can access the metadata of the external tables over JDBC:
 
@@ -95,7 +101,7 @@ CREATE CATALOG postgres WITH (
 Create a changelog table to consume the change events from the `pg_claims.claims.accident_claims` topic, with the same schema as the `accident_claims` source table, that consumes the `debezium-json` format:
 
 ```sql
-CREATE TABLE default_catalog.default_database.accident_claims
+CREATE TABLE accident_claims
 WITH (
   'connector' = 'kafka',
   'topic' = 'pg_claims.claims.accident_claims',
@@ -104,27 +110,25 @@ WITH (
   'format' = 'debezium-json',
   'scan.startup.mode' = 'earliest-offset'
  )
-LIKE `claims.accident_claims` ( 
+LIKE postgres.postgres.`claims.accident_claims` ( 
 EXCLUDING OPTIONS);
 ```
 
 and register a reference `members` table:
 
 ```sql
-CREATE TABLE default_catalog.default_database.members
-LIKE `claims.members` ( 
+CREATE TABLE members
+LIKE postgres.postgres.`claims.members` ( 
 INCLUDING OPTIONS);
 ```
 
-> ℹ️ For more details (and some limitations) of the Debezium Format, refer to the [Flink documentation](https://ci.apache.org/projects/flink/flink-docs-stable/dev/table/connectors/formats/debezium.html#debezium-format).
+> ℹ️ For more details on the Debezium Format, refer to the [Flink documentation](https://ci.apache.org/projects/flink/flink-docs-stable/dev/table/connectors/formats/debezium.html#debezium-format).
 
 ### Ch-ch-ch-ch-changes
 
 You can now query the changelog source table you just created:
 
 ```sql
-USE CATALOG default_catalog;
-
 SELECT * FROM accident_claims;
 ```
 
@@ -166,7 +170,11 @@ GROUP BY m.insurance_company, ac.accident_detail;
 
 Finally, create a simple [dashboard in Kibana](https://www.elastic.co/guide/en/kibana/current/dashboard-create-new-dashboard.html) with a 1s refresh rate and use the (very rustic) `postgres_datagen.sql` data generator script to periodically insert some records into the Postgres source table, creating visible changes in your results:
 
-`cat ./postgres_datagen.sql | docker exec -i flink-sql-cdc_postgres_1 psql -U postgres -d postgres`
+```bash
+cat ./postgres_datagen.sql | docker exec -i flink-sql-cdc_postgres_1 psql -U postgres -d postgres
+```
+
+![flink-sql-CDC_kibana](https://user-images.githubusercontent.com/23521087/109538607-93fbe300-7ac0-11eb-8840-2ed7b2aafa27.gif)
 
 <hr>
 

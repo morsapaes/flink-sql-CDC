@@ -50,14 +50,14 @@ services:
       KAFKA_BOOTSTRAP: kafka
       ES_HOST: elasticsearch
   jobmanager:
-    image: flink:1.11.1-scala_2.11
+    image: flink:1.12.1-scala_2.11
     ports:
       - "8081:8081"
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
   taskmanager:
-    image: flink:1.11.1-scala_2.11
+    image: flink:1.12.1-scala_2.11
     depends_on:
       - jobmanager
     command: taskmanager
