@@ -10,8 +10,9 @@ create table members (
 	address_country VARCHAR(10),
 	insurance_company VARCHAR(25),
 	insurance_number VARCHAR(50),
-	ts_created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	ts_updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+	--Avoiding temporal data types purely for the sake of convenience, given the existing limitations.
+	ts_created VARCHAR(20) DEFAULT TO_CHAR(CURRENT_TIMESTAMP,'YYYY-MM-DD HH:MI:SS'),
+	ts_updated VARCHAR(20) DEFAULT TO_CHAR(CURRENT_TIMESTAMP,'YYYY-MM-DD HH:MI:SS'),
 	PRIMARY KEY(id)
 );
 
