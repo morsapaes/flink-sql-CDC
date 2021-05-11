@@ -1,6 +1,14 @@
 # Change Data Capture with Flink SQL and Debezium
 
-See the [slides](https://noti.st/morsapaes/liQzgs/change-data-capture-with-flink-sql-and-debezium) for context.
+> :warning: **Update:** This repository will no longer be actively maintained. Please check the [Ververica fork](https://github.com/ververica/flink-sql-CDC).
+
+Change Data Capture (CDC) is not a new concept in itself — and the idea behind it is pretty simple: you track and propagate data changes in a database to downstream consumers. So, whenever you get an `INSERT`, `UPDATE` or `DELETE` operation in your database, you want to capture this change in state and make it available e.g. to your analytics workloads.
+
+Probably the most popular tool to do this log-based CDC out there these days is [Debezium](https://debezium.io/). What’s great about it is that it gives you a standard format for change events, so you can process this data in the same way regardless of where it’s coming from; and it transforms your databases into event streams that can be consumed in near-real time. Flink supports CDC with Debezium through 1) the [Kafka SQL Connector](https://ci.apache.org/projects/flink/flink-docs-stable/dev/table/connectors/formats/debezium.html) and 2) a set of "standalone" [Flink CDC Connectors](https://github.com/ververica/flink-cdc-connectors#flink-cdc-connectors).
+
+**Let's dig in!**
+
+In this demo, you'll be looking at some fake insurance claim data related to animal attacks in Australia and build a CDC-based analytics pipeline using Flink’s integration with catalogs, and then maintain a materialized view in Elasticsearch that is updated with whatever transactions are happening in Postgres. You can refer to [these slides](https://noti.st/morsapaes/QnBSAI/change-data-capture-with-flink-sql-and-debezium) for more context.
 
 ## Docker
 
@@ -180,6 +188,4 @@ cat ./postgres_datagen.sql | docker exec -i flink-sql-cdc_postgres_1 psql -U pos
 
 **And that's it!**
 
-This demo will get some polishing as CDC support in Flink matures.
-
-If you have any questions or feedback, feel free to DM me on Twitter [@morsapaes](https://twitter.com/morsapaes).
+For the latest updates, follow [Apache Flink](https://twitter.com/ApacheFlink) and [Debezium](https://twitter.com/apache_pulsar) on Twitter.
