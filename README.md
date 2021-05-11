@@ -2,9 +2,7 @@
 
 > :warning: **Update:** This repository will no longer be actively maintained. Please check the [Ververica fork](https://github.com/ververica/flink-sql-CDC).
 
-Change Data Capture (CDC) is not a new concept in itself — and the idea behind it is pretty simple: you track and propagate data changes in a database to downstream consumers. So, whenever you get an `INSERT`, `UPDATE` or `DELETE` operation in your database, you want to capture this change in state and make it available e.g. to your analytics workloads.
-
-Probably the most popular tool to do this log-based CDC out there these days is [Debezium](https://debezium.io/). What’s great about it is that it gives you a standard format for change events, so you can process this data in the same way regardless of where it’s coming from; and it transforms your databases into event streams that can be consumed in near-real time. Flink supports CDC with Debezium through 1) the [Kafka SQL Connector](https://ci.apache.org/projects/flink/flink-docs-stable/dev/table/connectors/formats/debezium.html) and 2) a set of "standalone" [Flink CDC Connectors](https://github.com/ververica/flink-cdc-connectors#flink-cdc-connectors).
+Probably the most popular tool to do log-based CDC out there these days is [Debezium](https://debezium.io/). What’s great about it is that it gives you a standard format for change events, so you can process changelog data in the same way regardless of where it’s coming from; and it transforms your databases into event streams that can be consumed in near-real time. Flink supports CDC with Debezium through 1) the [Kafka SQL Connector](https://ci.apache.org/projects/flink/flink-docs-stable/dev/table/connectors/formats/debezium.html) and 2) a set of "standalone" [Flink CDC Connectors](https://github.com/ververica/flink-cdc-connectors#flink-cdc-connectors).
 
 **Let's dig in!**
 
